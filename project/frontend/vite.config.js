@@ -6,6 +6,6 @@ export default defineConfig(({ command }) => {
   return {
     plugins: [react()],
     // Se siamo in produzione (npm run build), usa il nome della repo, altrimenti usa la root '/' per il locale
-    base: command === 'build' ? '/BKCH/' : '/',
+    base: command === 'build' ? '/bkch/' : '/',
   }
 })
