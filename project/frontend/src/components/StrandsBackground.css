@@ -1,0 +1,114 @@
+.strands-background {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.95;
+}
+
+.strands-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 90px 90px;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.95), transparent 85%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.95), transparent 85%);
+  animation: drift 24s linear infinite;
+}
+
+.strands-glow {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(90px);
+  mix-blend-mode: screen;
+  opacity: 0.45;
+  animation: pulse 8s ease-in-out infinite;
+}
+
+.glow-one {
+  width: 26rem;
+  height: 26rem;
+  background: #00f0ff;
+  left: -8rem;
+  top: 2rem;
+}
+
+.glow-two {
+  width: 24rem;
+  height: 24rem;
+  background: #7000ff;
+  right: -7rem;
+  top: 10rem;
+  animation-delay: -2s;
+}
+
+.glow-three {
+  width: 20rem;
+  height: 20rem;
+  background: #ff8c00;
+  bottom: -4rem;
+  left: 30%;
+  animation-delay: -4s;
+}
+
+.strands-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.45;
+}
+
+.strands-lines path {
+  fill: none;
+  stroke: rgba(255,255,255,0.5);
+  stroke-width: 2;
+  stroke-linecap: round;
+  animation: flow 14s ease-in-out infinite;
+}
+
+.strands-lines path:nth-child(2) {
+  animation-delay: -4s;
+  stroke: rgba(0,240,255,0.55);
+}
+
+.strands-lines path:nth-child(3) {
+  animation-delay: -8s;
+  stroke: rgba(112,0,255,0.55);
+}
+
+[data-theme='light'] .strands-grid {
+  background-image:
+    linear-gradient(rgba(0,0,0,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px);
+}
+
+[data-theme='light'] .strands-lines path {
+  stroke: rgba(0,0,0,0.18);
+}
+
+[data-theme='light'] .strands-lines path:nth-child(2) {
+  stroke: rgba(0,153,204,0.35);
+}
+
+[data-theme='light'] .strands-lines path:nth-child(3) {
+  stroke: rgba(112,0,255,0.28);
+}
+
+@keyframes drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-90px, -90px, 0); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(0.95); opacity: 0.35; }
+  50% { transform: scale(1.06); opacity: 0.55; }
+}
+
+@keyframes flow {
+  0%, 100% { stroke-dasharray: 0 1200; opacity: 0.26; }
+  50% { stroke-dasharray: 700 600; opacity: 0.7; }
+}
