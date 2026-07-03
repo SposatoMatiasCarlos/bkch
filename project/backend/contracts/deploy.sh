@@ -24,5 +24,5 @@ forge script script/Deploy.sol:Deploy \
   --private-key $PRIVATE_KEY \
   --broadcast \
   --verify \
-  --etherscan-api-key $ETHERSCAN_API_KEY \
+  --etherscan-api-key $ETHERSCAN_API_KEY \ 
   -vvvv # max verbosity (per debug)
