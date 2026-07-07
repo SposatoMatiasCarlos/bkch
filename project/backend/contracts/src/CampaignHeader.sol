@@ -51,10 +51,12 @@ struct CampaignParams {
 
 // --------------------------- Events --------------------------- //
 
+event CampaignCreated(address newCampaign, address sender, string name);
 event Funded(address indexed contributor, uint256 amount);
 event Withdrawn(address indexed contributor, uint256 amount);
 event CampaignFinalized(CampaignStatus status);
 event RewardClaimed(address indexed contributor, uint256 amount);
 event ProposerWithdrawn(uint256 amount);
+event Refunded(address indexed contributor, uint256 amount);
 
 // -------------------------------------------------------------- //
