@@ -11,7 +11,8 @@ fi
 
 source .env
 
-RPC_URL_VAR="${NETWORK^^}_RPC_URL"   # es: sepolia -> SEPOLIA_RPC_URL
+NETWORK_UPPER=$(echo "$NETWORK" | tr '[:lower:]' '[:upper:]')
+RPC_URL_VAR="${NETWORK_UPPER}_RPC_URL"   # es: sepolia -> SEPOLIA_RPC_URL
 RPC_URL=${!RPC_URL_VAR}
 
 if [ -z "$RPC_URL" ]; then
@@ -21,8 +22,7 @@ fi
 
 forge script script/Deploy.sol:Deploy \
   --rpc-url $RPC_URL \
-  --private-key $PRIVATE_KEY \
   --broadcast \
   --verify \
-  --etherscan-api-key $ETHERSCAN_API_KEY \ 
-  -vvvv # max verbosity (per debug)
+  --etherscan-api-key $ETHERSCAN_API_KEY \
+  -vvvv
