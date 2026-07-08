@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { getCampaignById, getDaysLeft, getProgress, formatNumber } from '../data/mockCampaigns'
+import { getCampaignById, getDaysLeft, getProgress, formatNumber } from '../logic/Util'
 import ProgressBar from '../components/ProgressBar'
 import './CampaignDetail.css'
 

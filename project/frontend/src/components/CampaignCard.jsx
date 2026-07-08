@@ -1,4 +1,4 @@
-import { getDaysLeft, formatNumber } from '../data/mockCampaigns'
+import { getDaysLeft, formatNumber } from '../logic/Util'
 import ProgressBar from './ProgressBar'
 import './CampaignCard.css'
 
@@ -46,11 +46,7 @@ export default function CampaignCard({ campaign, onSelectCampaign }) {
       <p className="campaign-card-desc">{campaign.description}</p>
 
       <div className="campaign-card-progress">
-        <ProgressBar
-          raised={campaign.raised}
-          threshold={campaign.threshold}
-          symbol={campaign.fundingToken.symbol}
-        />
+        <ProgressBar raised={Number(campaign.raised)} threshold={Number(campaign.threshold)} symbol={campaign.symbol} />
       </div>
     </div>
   )

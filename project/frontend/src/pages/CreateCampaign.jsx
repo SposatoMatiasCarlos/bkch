@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import './CreateCampaign.css'
+import { createCampaign } from '../logic/Campaigns'
+import { useWallet } from '../data/WalletContext'
 
 export default function CreateCampaign({ onNavigate }) {
-  const [showToast, setShowToast] = useState(false)
 
+  const [showToast, setShowToast] = useState(false);
+  const { signer, provider } = useWallet();
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -20,14 +23,39 @@ export default function CreateCampaign({ onNavigate }) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    setShowToast(true)
-    setTimeout(() => {
-      setShowToast(false)
-      onNavigate('explore')
-    }, 2000)
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!signer) {
+      alert("Devi prima connettere il wallet.");
+      return;
+    }
+
+    const campaignDetails = {
+      name: form.name,
+      description: form.description,
+      fundingToken: form.fundingTokenAddress,
+      rewardToken: form.rewardTokenAddress,
+      exchangeRate: BigInt(form.exchangeRate),
+      threshold: BigInt(form.threshold),
+      deadline: BigInt(Math.floor(new Date(form.deadline).getTime() / 1000)),
+    };
+
+    try {
+      const { campaignAddress } = await createCampaign(signer, campaignDetails);
+
+      if (campaignAddress) {
+        const details = await getCampaignDetails(provider, campaignAddress);
+        console.log("Nuova campagna:", campaignAddress);
+        console.log("Dettagli:", details);
+      }
+
+      setShowToast(true);
+      onNavigate('explore');
+    } catch (err) {
+      console.error("Creazione campagna fallita:", err);
+    }
+  };
 
   const daysUntilDeadline = form.deadline
     ? Math.max(0, Math.ceil((new Date(form.deadline) - new Date()) / (1000 * 60 * 60 * 24)))

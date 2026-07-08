@@ -1,4 +1,4 @@
-import { getProgress, formatNumber } from '../data/mockCampaigns'
+import { getProgress, formatNumber } from '../logic/Util'
 import './ProgressBar.css'
 
 export default function ProgressBar({ raised, threshold, symbol, size = 'default', showLabel = true }) {

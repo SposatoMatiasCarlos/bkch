@@ -4,6 +4,8 @@ import StrandsBackground from './components/StrandsBackground'
 import ExploreCampaigns from './pages/ExploreCampaigns'
 import CreateCampaign from './pages/CreateCampaign'
 import CampaignDetail from './pages/CampaignDetail'
+import { WalletProvider } from './data/WalletContext'
+
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('explore') // 'explore', 'create', 'detail'
@@ -46,28 +48,32 @@ export default function App() {
 
   return (
     <>
-      <StrandsBackground />
-      {/* Passiamo lo stato corrente del tema e la funzione per cambiarlo alla Navbar */}
-      <Navbar
-        currentPage={currentPage}
-        onNavigate={handleNavigate}
-        theme={theme}
-        onToggleTheme={handleToggleTheme}
-      />
-      <main style={{ position: 'relative', zIndex: 1 }}>
-        {currentPage === 'explore' && (
-          <ExploreCampaigns onSelectCampaign={handleSelectCampaign} />
-        )}
-        {currentPage === 'create' && (
-          <CreateCampaign onNavigate={handleNavigate} />
-        )}
-        {currentPage === 'detail' && (
-          <CampaignDetail
-            campaignId={selectedCampaignId}
-            onBackToExplore={() => handleNavigate('explore')}
-          />
-        )}
-      </main>
+      <WalletProvider>
+
+        <StrandsBackground />
+        <Navbar
+          currentPage={currentPage}
+          onNavigate={handleNavigate}
+          theme={theme}
+          onToggleTheme={handleToggleTheme}
+        />
+        <main style={{ position: 'relative', zIndex: 1 }}>
+          {currentPage === 'explore' && (
+            <ExploreCampaigns onSelectCampaign={handleSelectCampaign} />
+          )}
+          {currentPage === 'create' && (
+            <CreateCampaign onNavigate={handleNavigate} />
+          )}
+          {currentPage === 'detail' && (
+            <CampaignDetail
+              campaignId={selectedCampaignId}
+              onBackToExplore={() => handleNavigate('explore')}
+            />
+          )}
+        </main>
+
+
+      </WalletProvider>
     </>
   )
 }

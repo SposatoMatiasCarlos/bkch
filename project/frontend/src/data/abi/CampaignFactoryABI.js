@@ -1,0 +1,181 @@
+export const CampaignFactoryABI = [
+  {
+    inputs: [],
+    name: "EmptyDescription",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "EmptyName",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "IdenticalTokens",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "currentTimestamp",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "providedDeadline",
+        type: "uint256",
+      },
+    ],
+    name: "InvalidDeadline",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidExchangeRate",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "contract IERC20",
+        name: "token",
+        type: "address",
+      },
+    ],
+    name: "InvalidFundingToken",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "contract IERC20",
+        name: "token",
+        type: "address",
+      },
+    ],
+    name: "InvalidRewardToken",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidThreshold",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "TransferFailed",
+    type: "error",
+  },
+
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "newCampaign",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "sender",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "name",
+        type: "string",
+      },
+    ],
+    name: "CampaignCreated",
+    type: "event",
+  },
+
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    name: "campaigns",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+
+  {
+    inputs: [
+      {
+        components: [
+          {
+            internalType: "string",
+            name: "name",
+            type: "string",
+          },
+          {
+            internalType: "string",
+            name: "description",
+            type: "string",
+          },
+          {
+            internalType: "contract IERC20",
+            name: "fundingToken",
+            type: "address",
+          },
+          {
+            internalType: "contract IERC20",
+            name: "rewardToken",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "exchangeRate",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "threshold",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "deadline",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct CampaignParams",
+        name: "params",
+        type: "tuple",
+      },
+    ],
+    name: "createCampaign",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+
+  {
+    inputs: [],
+    name: "getCampaigns",
+    outputs: [
+      {
+        internalType: "address[]",
+        name: "",
+        type: "address[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+];

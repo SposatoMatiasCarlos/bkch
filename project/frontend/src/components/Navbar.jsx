@@ -1,21 +1,36 @@
-import { useState } from 'react'
 import './Navbar.css'
 import ThemeSwitch from './ThemeSwitch'
 import MetaMaskFox from '../assets/MetaMask_Fox.png'
+import { shortenAddress } from '../logic/Util'
+import { connectWallet } from '../logic/ConnectWallet';
+import { useWallet } from '../data/WalletContext';
+
 
 export default function Navbar({ currentPage, onNavigate, theme, onToggleTheme }) {
-  const [connected, setConnected] = useState(false)
-  const [address, setAddress] = useState('')
-
-  const handleConnect = () => {
-    if (connected) {
-      setConnected(false)
-      setAddress('')
-    } else {
-      setConnected(true)
-      setAddress('0x7f3A...dE21')
+  
+  // Accede ai dati del wallet dal contesto
+  const { connected, address, setConnected, setAddress, setWalletProvider, setSigner } = useWallet();
+  
+  const handleConnect = async () => {
+    if(connected == true){
+      console.log("Wallet already connected:");
+      console.log("- Address:", address);
+      console.log("- WalletProvider:", setWalletProvider);
+      console.log("- Signer:", setSigner); 
+      return; 
     }
-  }
+    
+    const info = await connectWallet();
+    if (info == null) {
+      setConnected(false);
+      setAddress('');
+    } else {
+      setConnected(true);
+      setAddress(info.address);
+      setWalletProvider(info.provider);
+      setSigner(info.signer);
+    }
+  };
 
   return (
     <nav className="navbar" id="main-navbar">
@@ -66,7 +81,7 @@ export default function Navbar({ currentPage, onNavigate, theme, onToggleTheme }
             {connected ? (
               <>
                 <img src={MetaMaskFox} alt="MetaMask" className="wallet-icon" />
-                <span>{address}</span>
+                <span>{shortenAddress(address)}</span>
               </>
             ) : (
               <>
@@ -81,7 +96,7 @@ export default function Navbar({ currentPage, onNavigate, theme, onToggleTheme }
             <ThemeSwitch checked={theme === 'dark'} onChange={onToggleTheme} />
           </div>
 
-     
+
         </div>
       </div>
     </nav>

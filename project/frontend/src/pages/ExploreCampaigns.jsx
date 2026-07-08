@@ -1,23 +1,39 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
+import { useWallet } from '../data/WalletContext';
 import CampaignCard from '../components/CampaignCard'
-import { MOCK_CAMPAIGNS } from '../data/mockCampaigns'
+import { getAllCampaignsWithDetails } from '../logic/Campaigns'
 import './ExploreCampaigns.css'
 
 const FILTERS = ['All', 'Active', 'Funded', 'Ended']
 
 export default function ExploreCampaigns({ onSelectCampaign }) {
+
+  const [campaigns, setCampaigns] = useState([]);
   const [activeFilter, setActiveFilter] = useState('All')
+  const { rpcProvider } = useWallet()
+
+  useEffect(() => { loadCampaigns(rpcProvider); }, [rpcProvider]);
+
+  async function loadCampaigns() {
+    try {
+      const data = await getAllCampaignsWithDetails(rpcProvider);
+      setCampaigns(data);
+      console.log("Campagne caricate: ", data);
+    } catch (err) {
+      console.error("Errore nel caricamento delle campagne:", err);
+    }
+  }
+
 
   const filteredCampaigns = useMemo(() => {
-    return MOCK_CAMPAIGNS.filter((c) => {
-      // Status filter
+    return campaigns.filter((c) => {
       if (activeFilter === 'All') return true
-      if (activeFilter === 'Active') return c.status === 'active'
-      if (activeFilter === 'Funded') return c.status === 'funded'
-      if (activeFilter === 'Ended') return c.status === 'ended'
+      if (activeFilter === 'Active') return c.status === "0"
+      if (activeFilter === 'Funded') return c.status === "1"
+      if (activeFilter === 'Ended') return c.status === "2"
       return true
     })
-  }, [activeFilter])
+  }, [campaigns, activeFilter])
 
   return (
     <div className="explore-page" id="explore-page">
@@ -44,7 +60,7 @@ export default function ExploreCampaigns({ onSelectCampaign }) {
         {filteredCampaigns.length > 0 ? (
           <div className="campaigns-grid">
             {filteredCampaigns.map((campaign, i) => (
-              <div key={campaign.id} style={{ animationDelay: `${120 + i * 60}ms` }} className="animate-fade-in-up">
+              <div key={campaign.address} style={{ animationDelay: `${120 + i * 60}ms` }} className="animate-fade-in-up">
                 <CampaignCard campaign={campaign} onSelectCampaign={onSelectCampaign} />
               </div>
             ))}
