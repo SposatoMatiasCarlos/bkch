@@ -70,7 +70,7 @@ export default function CreateCampaign({ onNavigate }) {
 
         <form className="create-form" onSubmit={handleSubmit}>
           {/* Campaign Info */}
-          <div className="form-section animate-fade-in-up" style={{ animationDelay: '80ms' }}>
+          <div className="form-section animate-fade-in-up">
             <h2 className="form-section-title">Campaign Info</h2>
             <p className="form-section-desc">
               Give your campaign a clear name and description to attract backers.
@@ -106,7 +106,7 @@ export default function CreateCampaign({ onNavigate }) {
           </div>
 
           {/* Token Configuration */}
-          <div className="form-section animate-fade-in-up" style={{ animationDelay: '160ms' }}>
+          <div className="form-section animate-fade-in-up">
             <h2 className="form-section-title">Token Configuration</h2>
             <p className="form-section-desc">
               Specify the ERC-20 tokens used for funding contributions and backer rewards.
@@ -185,7 +185,7 @@ export default function CreateCampaign({ onNavigate }) {
                     value={form.exchangeRate}
                     onChange={handleChange}
                     required
-                    style={{ paddingRight: '80px' }}
+                    className="form-input form-input--suffix"
                   />
                   <span className="form-input-suffix">
                     {form.rewardTokenSymbol || 'RWD'} / {form.fundingTokenSymbol || 'FND'}
@@ -196,7 +196,7 @@ export default function CreateCampaign({ onNavigate }) {
           </div>
 
           {/* Campaign Settings */}
-          <div className="form-section animate-fade-in-up" style={{ animationDelay: '240ms' }}>
+          <div className="form-section animate-fade-in-up">
             <h2 className="form-section-title">Campaign Settings</h2>
             <p className="form-section-desc">
               Set the funding threshold and deadline. These are enforced on-chain.
@@ -218,7 +218,7 @@ export default function CreateCampaign({ onNavigate }) {
                       value={form.threshold}
                       onChange={handleChange}
                       required
-                      style={{ paddingRight: '56px' }}
+                      className="form-input form-input--suffix"
                     />
                     <span className="form-input-suffix">{form.fundingTokenSymbol || 'FND'}</span>
                   </div>
@@ -279,7 +279,7 @@ export default function CreateCampaign({ onNavigate }) {
             )}
           </div>
 
-          <div className="create-submit-area animate-fade-in-up" style={{ animationDelay: '320ms' }}>
+          <div className="create-submit-area animate-fade-in-up">
             <button type="submit" className="btn btn-primary btn-lg" id="submit-campaign">
               Create Campaign
             </button>

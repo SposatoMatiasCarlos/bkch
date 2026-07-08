@@ -1,52 +1,34 @@
 import './Navbar.css'
-import ThemeSwitch from './ThemeSwitch'
 import MetaMaskFox from '../assets/MetaMask_Fox.png'
 import { shortenAddress } from '../logic/Util'
-import { connectWallet } from '../logic/ConnectWallet';
-import { useWallet } from '../data/WalletContext';
+import { connectWallet } from '../logic/ConnectWallet'
+import { useWallet } from '../data/WalletContext'
 
+export default function Navbar({ currentPage, onNavigate }) {
+  const { connected, address, setConnected, setAddress, walletProvider, setWalletProvider, setSigner } = useWallet()
 
-export default function Navbar({ currentPage, onNavigate, theme, onToggleTheme }) {
-  
-  // Accede ai dati del wallet dal contesto
-  const { connected, address, setConnected, setAddress, setWalletProvider, setSigner } = useWallet();
-  
   const handleConnect = async () => {
-    if(connected == true){
-      console.log("Wallet already connected:");
-      console.log("- Address:", address);
-      console.log("- WalletProvider:", setWalletProvider);
-      console.log("- Signer:", setSigner); 
-      return; 
+    if (connected) {
+      console.log('Wallet already connected:')
+      console.log('- Address:', address)
+      console.log('- WalletProvider:', walletProvider)
+      console.log('- Signer:', setSigner)
+      return
     }
-    
-    const info = await connectWallet();
+
+    const info = await connectWallet()
     if (info == null) {
-      setConnected(false);
-      setAddress('');
+      setConnected(false)
     } else {
-      setConnected(true);
-      setAddress(info.address);
-      setWalletProvider(info.provider);
-      setSigner(info.signer);
+      setConnected(true)
+      setAddress(info.address)
+      setWalletProvider(info.provider)
+      setSigner(info.signer)
     }
-  };
+  }
 
   return (
     <nav className="navbar" id="main-navbar">
-      {/* SVG gradients for metallic rendering */}
-      <svg width="0" height="0" style={{ position: 'absolute' }}>
-        <defs>
-          <linearGradient id="metallic-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#FFFFFF" />
-            <stop offset="25%" stopColor="#D8D8D8" />
-            <stop offset="50%" stopColor="#9C9C9C" />
-            <stop offset="75%" stopColor="#E6E6E6" />
-            <stop offset="100%" stopColor="#7F7F7F" />
-          </linearGradient>
-        </defs>
-      </svg>
-
       <div className="container navbar-inner">
         <button className="navbar-logo-btn" onClick={() => onNavigate('explore')}>
           <span className="navbar-logo-text">BKCH Project</span>
@@ -78,24 +60,9 @@ export default function Navbar({ currentPage, onNavigate, theme, onToggleTheme }
             onClick={handleConnect}
             id="wallet-connect-btn"
           >
-            {connected ? (
-              <>
-                <img src={MetaMaskFox} alt="MetaMask" className="wallet-icon" />
-                <span>{shortenAddress(address)}</span>
-              </>
-            ) : (
-              <>
-                <img src={MetaMaskFox} alt="MetaMask" className="wallet-icon" />
-                <span>Connect Wallet</span>
-              </>
-            )}
+            <img src={MetaMaskFox} alt="MetaMask" className="wallet-icon" />
+            {connected ? <span>{shortenAddress(address)}</span> : <span>Connect Wallet</span>}
           </button>
-
-          {/* Pulsante del Tema Premium ed Essenziale */}
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <ThemeSwitch checked={theme === 'dark'} onChange={onToggleTheme} />
-          </div>
-
 
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { getCampaignById, getDaysLeft, getProgress, formatNumber } from '../logic/Util'
+import { getCampaignById, getDaysLeft, formatNumber } from '../logic/Util'
 import ProgressBar from '../components/ProgressBar'
 import './CampaignDetail.css'
 
@@ -24,7 +24,6 @@ export default function CampaignDetail({ campaignId, onBackToExplore }) {
   }
 
   const daysLeft = getDaysLeft(campaign.deadline)
-  const progress = getProgress(campaign.raised, campaign.threshold)
   const isFunded = campaign.status === 'funded'
   const isEnded = !isFunded && daysLeft === 0
   const isActive = !isFunded && !isEnded
@@ -102,7 +101,7 @@ export default function CampaignDetail({ campaignId, onBackToExplore }) {
             </div>
 
             {/* Token Info */}
-            <div className="detail-tokens animate-fade-in-up" style={{ animationDelay: '80ms' }}>
+            <div className="detail-tokens animate-fade-in-up">
               <h2 className="detail-section-title">Token Details</h2>
               <div className="detail-token-grid">
                 <div className="detail-token-item">
@@ -125,7 +124,7 @@ export default function CampaignDetail({ campaignId, onBackToExplore }) {
             </div>
 
             {/* Recent Backers */}
-            <div className="detail-backers animate-fade-in-up" style={{ animationDelay: '160ms' }}>
+            <div className="detail-backers animate-fade-in-up">
               <h2 className="detail-section-title">Recent Backers</h2>
               <div className="backer-list">
                 {campaign.backers.map((backer, i) => (
@@ -146,7 +145,7 @@ export default function CampaignDetail({ campaignId, onBackToExplore }) {
           {/* Sidebar */}
           <div className="detail-sidebar">
             {/* Action Card */}
-            <div className="detail-action-card animate-fade-in" style={{ animationDelay: '100ms' }}>
+            <div className="detail-action-card animate-fade-in">
               {isActive ? (
                 <>
                   <h3 className="detail-action-title">Back this campaign</h3>
@@ -213,7 +212,7 @@ export default function CampaignDetail({ campaignId, onBackToExplore }) {
             </div>
 
             {/* Info Card */}
-            <div className="detail-info-card animate-fade-in" style={{ animationDelay: '200ms' }}>
+            <div className="detail-info-card animate-fade-in">
               <h4 className="detail-info-title">Campaign Info</h4>
               <div className="detail-info-rows">
                 <div className="detail-info-row">

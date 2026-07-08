@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import './App.css'
 import Navbar from './components/Navbar'
 import StrandsBackground from './components/StrandsBackground'
 import ExploreCampaigns from './pages/ExploreCampaigns'
@@ -6,31 +7,9 @@ import CreateCampaign from './pages/CreateCampaign'
 import CampaignDetail from './pages/CampaignDetail'
 import { WalletProvider } from './data/WalletContext'
 
-
 export default function App() {
-  const [currentPage, setCurrentPage] = useState('explore') // 'explore', 'create', 'detail'
+  const [currentPage, setCurrentPage] = useState('explore')
   const [selectedCampaignId, setSelectedCampaignId] = useState(null)
-
-  // Inizializza il tema controllando il localStorage (default: 'dark')
-  const [theme, setTheme] = useState(() => {
-    if (typeof window === 'undefined') {
-      return 'dark'
-    }
-
-    const storedTheme = localStorage.getItem('theme')
-    return storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : 'dark'
-  })
-
-  // Sincronizza l'attributo data-theme sull'elemento HTML ogni volta che il tema cambia
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-    localStorage.setItem('theme', theme)
-  }, [theme])
-
-  // Funzione per switchare il tema
-  const handleToggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === 'dark' ? 'light' : 'dark'))
-  }
 
   const handleNavigate = (page) => {
     setCurrentPage(page)
@@ -49,15 +28,10 @@ export default function App() {
   return (
     <>
       <WalletProvider>
-
         <StrandsBackground />
-        <Navbar
-          currentPage={currentPage}
-          onNavigate={handleNavigate}
-          theme={theme}
-          onToggleTheme={handleToggleTheme}
-        />
-        <main style={{ position: 'relative', zIndex: 1 }}>
+
+        <Navbar currentPage={currentPage} onNavigate={handleNavigate} />
+        <main className="app-main">
           {currentPage === 'explore' && (
             <ExploreCampaigns onSelectCampaign={handleSelectCampaign} />
           )}

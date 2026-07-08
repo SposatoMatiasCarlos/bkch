@@ -1,4 +1,4 @@
-import { getDaysLeft, formatNumber } from '../logic/Util'
+import { getDaysLeft } from '../logic/Util'
 import ProgressBar from './ProgressBar'
 import './CampaignCard.css'
 

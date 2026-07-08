@@ -80,24 +80,6 @@
   stroke: rgba(112,0,255,0.55);
 }
 
-[data-theme='light'] .strands-grid {
-  background-image:
-    linear-gradient(rgba(0,0,0,0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px);
-}
-
-[data-theme='light'] .strands-lines path {
-  stroke: rgba(0,0,0,0.18);
-}
-
-[data-theme='light'] .strands-lines path:nth-child(2) {
-  stroke: rgba(0,153,204,0.35);
-}
-
-[data-theme='light'] .strands-lines path:nth-child(3) {
-  stroke: rgba(112,0,255,0.28);
-}
-
 @keyframes drift {
   from { transform: translate3d(0, 0, 0); }
   to { transform: translate3d(-90px, -90px, 0); }
