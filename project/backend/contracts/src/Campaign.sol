@@ -5,6 +5,8 @@ import "./CampaignHeader.sol";
 
 contract Campaign {
     
+    string  public name;
+    string  public description;
     address public immutable proposer;
     IERC20  public immutable fundingToken;
     IERC20  public immutable rewardToken;
@@ -30,6 +32,8 @@ contract Campaign {
     }
 
     constructor(address _proposer, CampaignParams memory params) {
+        name = params.name;
+        description = params.description;
         proposer = _proposer;
         fundingToken = params.fundingToken;
         rewardToken = params.rewardToken;

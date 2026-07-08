@@ -42,6 +42,7 @@ enum CampaignStatus {
 struct CampaignParams {
     string name;
     string description;
+    address proposer; 
     IERC20 fundingToken;
     IERC20 rewardToken;
     uint256 exchangeRate;
