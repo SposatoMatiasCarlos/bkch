@@ -2,6 +2,7 @@
 pragma solidity >=0.8.34;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
 // --------------------------- Errors --------------------------- //
 
@@ -42,7 +43,6 @@ enum CampaignStatus {
 struct CampaignParams {
     string name;
     string description;
-    address proposer; 
     IERC20 fundingToken;
     IERC20 rewardToken;
     uint256 exchangeRate;
@@ -60,4 +60,15 @@ event RewardClaimed(address indexed contributor, uint256 amount);
 event ProposerWithdrawn(uint256 amount);
 event Refunded(address indexed contributor, uint256 amount);
 
-// -------------------------------------------------------------- //
+// ---------------------------- Helpers ------------------------------ //
+
+function _convertToReward(uint256 fundingAmount, uint256 exchangeRate, 
+                          IERC20  fundingToken,  IERC20  rewardToken) view returns (uint256) {
+    uint8 fundingDecimals = IERC20Metadata(address(fundingToken)).decimals();
+    uint8 rewardDecimals = IERC20Metadata(address(rewardToken)).decimals();
+    return (fundingAmount * exchangeRate * (10 ** rewardDecimals)) / (10 ** fundingDecimals);
+}
+
+function _getRequiredRewards(CampaignParams memory params) view returns (uint256) {
+    return _convertToReward(params.threshold, params.exchangeRate, params.fundingToken, params.rewardToken);
+}

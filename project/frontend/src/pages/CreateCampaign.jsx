@@ -185,7 +185,6 @@ export default function CreateCampaign({ onNavigate }) {
                     value={form.exchangeRate}
                     onChange={handleChange}
                     required
-                    className="form-input form-input--suffix"
                   />
                   <span className="form-input-suffix">
                     {form.rewardTokenSymbol || 'RWD'} / {form.fundingTokenSymbol || 'FND'}
@@ -218,7 +217,6 @@ export default function CreateCampaign({ onNavigate }) {
                       value={form.threshold}
                       onChange={handleChange}
                       required
-                      className="form-input form-input--suffix"
                     />
                     <span className="form-input-suffix">{form.fundingTokenSymbol || 'FND'}</span>
                   </div>

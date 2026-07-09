@@ -1,26 +1,23 @@
-import { getDaysLeft } from '../logic/Util'
+import { getCampaignState } from '../logic/Util'
 import ProgressBar from './ProgressBar'
 import './CampaignCard.css'
 
 export default function CampaignCard({ campaign, onSelectCampaign }) {
-  const daysLeft = getDaysLeft(campaign.deadline)
-  const isFunded = campaign.status === 'funded'
+  const { isFailed, needsFinalize, statusLabel } = getCampaignState(campaign)
 
-  const statusBadge = isFunded
-    ? { className: 'badge badge-funded', text: 'Funded' }
-    : daysLeft <= 3 && daysLeft > 0
-    ? { className: 'badge badge-warning', text: `${daysLeft}d left` }
-    : daysLeft === 0
-    ? { className: 'badge badge-ended', text: 'Ended' }
-    : { className: 'badge badge-active', text: 'Active' }
+  const statusBadge = isFailed
+    ? { className: 'badge badge-ended', text: 'Failed' }
+    : needsFinalize
+    ? { className: 'badge badge-pending', text: 'Awaiting finalization' }
+    : { className: 'badge badge-active', text: statusLabel }
 
   const handleCardClick = () => {
-    onSelectCampaign(campaign.id)
+    onSelectCampaign(campaign)
   }
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      onSelectCampaign(campaign.id)
+      onSelectCampaign(campaign)
     }
   }
 
@@ -39,8 +36,8 @@ export default function CampaignCard({ campaign, onSelectCampaign }) {
       </div>
 
       <div className="campaign-card-tokens">
-        <span className="token-pill">{campaign.fundingToken.symbol}</span>
-        <span className="token-pill">{campaign.rewardToken.symbol}</span>
+        <span className="token-pill">{campaign.fundingSymbol}</span>
+        <span className="token-pill">{campaign.rewardSymbol}</span>
       </div>
 
       <p className="campaign-card-desc">{campaign.description}</p>

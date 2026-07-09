@@ -9,18 +9,18 @@ import { WalletProvider } from './data/WalletContext'
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('explore')
-  const [selectedCampaignId, setSelectedCampaignId] = useState(null)
+  const [selectedCampaign, setSelectedCampaign] = useState(null)
 
   const handleNavigate = (page) => {
     setCurrentPage(page)
     if (page !== 'detail') {
-      setSelectedCampaignId(null)
+      setSelectedCampaign(null)
     }
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleSelectCampaign = (id) => {
-    setSelectedCampaignId(id)
+  const handleSelectCampaign = (campaign) => {
+    setSelectedCampaign(campaign)
     setCurrentPage('detail')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -39,13 +39,9 @@ export default function App() {
             <CreateCampaign onNavigate={handleNavigate} />
           )}
           {currentPage === 'detail' && (
-            <CampaignDetail
-              campaignId={selectedCampaignId}
-              onBackToExplore={() => handleNavigate('explore')}
-            />
+            <CampaignDetail campaign={selectedCampaign} onBackToExplore={() => handleNavigate('explore')}/>
           )}
         </main>
-
 
       </WalletProvider>
     </>

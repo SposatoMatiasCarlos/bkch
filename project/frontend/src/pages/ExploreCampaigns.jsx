@@ -6,15 +6,14 @@ import './ExploreCampaigns.css'
 
 export default function ExploreCampaigns({ onSelectCampaign }) {
   const [campaigns, setCampaigns] = useState([])
-  const { rpcProvider } = useWallet()
+  const { rpcProvider, address } = useWallet()
 
-  useEffect(() => {
-    loadCampaigns()
-  }, [rpcProvider])
+  useEffect(() => { loadCampaigns() }, [rpcProvider, address])
 
   async function loadCampaigns() {
     try {
-      const data = await getAllCampaignsWithDetails(rpcProvider)
+      const data = await getAllCampaignsWithDetails(rpcProvider, address)
+      console.log('Campagne caricate:', data)
       setCampaigns(data)
     } catch (err) {
       console.error('Errore nel caricamento delle campagne:', err)

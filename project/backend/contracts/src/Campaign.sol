@@ -89,7 +89,11 @@ contract Campaign {
         if (contributed == 0) revert NoContribution();
 
         hasClaimed[msg.sender] = true;
-        uint256 reward = contributed * exchangeRate;
+        
+        // Fixato per tener conto dei decimali
+        // uint256 reward = contributed * exchangeRate;
+        uint256 reward = _convertToReward(contributed, exchangeRate, fundingToken, rewardToken);
+
 
         bool ok = rewardToken.transfer(msg.sender, reward);
         if (!ok) revert TransferFailed();

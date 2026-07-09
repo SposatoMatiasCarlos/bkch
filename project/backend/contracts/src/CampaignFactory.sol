@@ -27,12 +27,20 @@ contract CampaignFactory {
         _; 
     }
 
+    function getRequiredRewards(CampaignParams memory params) external view returns (uint256) {
+        return _getRequiredRewards(params); 
+    }
+
     // -------------------------------------------------------------- //
 
-    // Creates a new campaign
+    // Creates a new campaign    
     function createCampaign(CampaignParams memory params) external validateCampaignInputs(params) {
         
-        uint256 requiredRewards = params.threshold * params.exchangeRate;
+        uint256 requiredRewards = _getRequiredRewards(params);
+        
+        //   Fixed: Questo calcolo non tiene in considerazione i decimali dei token
+        //   uint256 requiredRewards = params.threshold * params.exchangeRate;
+
         Campaign newCampaign = new Campaign(msg.sender, params);
         campaigns.push(address(newCampaign));
 

@@ -13,7 +13,7 @@ import "../src/DummyToken.sol";
 
 contract Deploy is Script {
 
-    function run() external returns (TestToken token) {
+    function run() external returns (CampaignFactory factory) {
         
         // Chiave privata per firmare la transazione
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
@@ -23,10 +23,10 @@ contract Deploy is Script {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        token = new TestToken("Charlie Coin", "WAC");
+        factory = new CampaignFactory();
 
         vm.stopBroadcast();
 
-        console.log("Contract deployed at:", address(token));
+        console.log("Contract deployed at:", address(factory));
     }
 }
