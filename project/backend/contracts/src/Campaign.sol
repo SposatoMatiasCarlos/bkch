@@ -70,15 +70,17 @@ contract Campaign {
 
         bool ok = fundingToken.transfer(msg.sender, amount);
         if (!ok) revert TransferFailed();
-
-        emit Withdrawn(msg.sender, amount);
     }
 
     function finalize() external onlyInProgress {
-        if (block.timestamp < deadline) revert DeadlineNotReached(block.timestamp, deadline);
-
-        status = totalRaised >= threshold ? CampaignStatus.SUCCESS : CampaignStatus.FAILED;
-        emit CampaignFinalized(status);
+        bool deadlinePassed = block.timestamp >= deadline;
+        // Fixato per tener conto di una chiusura anticipata
+        // data dal raggiungimento della soglia
+        bool thresholdReached = totalRaised >= threshold;
+        if (!deadlinePassed && !thresholdReached) {
+            revert DeadlineNotReached(block.timestamp, deadline);
+        }
+        status = thresholdReached ? CampaignStatus.SUCCESS : CampaignStatus.FAILED;
     }
 
     function claimRewardToken() external {
@@ -97,8 +99,6 @@ contract Campaign {
 
         bool ok = rewardToken.transfer(msg.sender, reward);
         if (!ok) revert TransferFailed();
-
-        emit RewardClaimed(msg.sender, reward);
     }
 
     function refund() external {
@@ -111,32 +111,32 @@ contract Campaign {
 
         bool ok = fundingToken.transfer(msg.sender, contributed);
         if (!ok) revert TransferFailed();
-
-        emit Refunded(msg.sender, contributed);
     }
 
     function proposerWithdraw() external onlyProposer {
-        
+
+        if (status == CampaignStatus.IN_PROGRESS) {
+            revert CampaignStillInProgress();
+        }
+
         if (status == CampaignStatus.SUCCESS) {
-            uint256 amount = totalRaised;
+            uint256 amount = fundingToken.balanceOf(address(this));
             if (amount == 0) revert NothingToWithdraw();
-            totalRaised = 0;
+
             bool ok = fundingToken.transfer(proposer, amount);
             if (!ok) revert TransferFailed();
+            return;
+        }
 
-            emit ProposerWithdrawn(amount);
-        
-        } 
-        else if (status == CampaignStatus.FAILED) {
-    
+        if (status == CampaignStatus.FAILED) {
             uint256 remainingRewards = rewardToken.balanceOf(address(this));
             if (remainingRewards == 0) revert NothingToWithdraw();
 
             bool ok = rewardToken.transfer(proposer, remainingRewards);
             if (!ok) revert TransferFailed();
-        } 
-        else revert CampaignStillInProgress();
 
+            return;
+        }
     }
 
 }

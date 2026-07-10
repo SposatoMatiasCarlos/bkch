@@ -46,8 +46,6 @@ contract CampaignFactory {
 
         bool ok = params.rewardToken.transferFrom(msg.sender, address(newCampaign), requiredRewards);
         if (!ok) revert TransferFailed();
-
-        emit CampaignCreated(address(newCampaign), msg.sender, params.name);
     }
 
     // Returns all the existing campaigns

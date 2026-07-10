@@ -3,7 +3,7 @@ import { CampaignFactoryABI } from "../data/abi/CampaignFactoryABI.js";
 import { CampaignABI } from "../data/abi/CampaignABI.js";
 import { ERC20ABI } from "../data/abi/ERC20ABI.js";
 
-const FACTORY_ADDRESS = "0x5DE53a395477D8Cb1b4f308dEa3F550635156f6e";
+const FACTORY_ADDRESS = "0x9A2Bb5fDCA1e5487B59D5F090a4998A41b0EEfaf";
 
 // ------------------------------------------------------------------------ //
 // Combina le funzioni per ottenere tutte le campagne con i loro dettagli,
@@ -69,7 +69,7 @@ export async function getCampaignDetails(provider, campaignAddress, userAddress)
   let myContribution = 0n;
   let hasClaimed = false;
 
-  if (userAddress != '') {
+  if (userAddress) {
     [myContribution, hasClaimed] = await Promise.all([
       campaign.contributions(userAddress),
       campaign.hasClaimed(userAddress)
@@ -87,13 +87,13 @@ export async function getCampaignDetails(provider, campaignAddress, userAddress)
     rewardDecimals,
     rewardToken,
     rewardSymbol,
-    threshold: threshold.toString(),
+    threshold: ethers.formatUnits(threshold, fundingDecimals),
+    raised: ethers.formatUnits(totalRaised, fundingDecimals),
+    myContribution: ethers.formatUnits(myContribution, fundingDecimals),
     deadline: deadline.toString(),
     exchangeRate: exchangeRate.toString(),
-    raised: totalRaised.toString(),
     status: Number(status),
-    myContribution: myContribution.toString(),
-    hasClaimed
+    hasClaimed,
   };
 }
 
@@ -152,31 +152,10 @@ export async function createCampaign(signer, campaignDetails) {
       await approveTx.wait();
     }
 
-    const tx = await factory.createCampaign({
-      name,
-      description,
-      fundingToken,
-      rewardToken,
-      exchangeRate: BigInt(exchangeRate),
-      threshold: thresholdWithDecimals,
-      deadline
-    });
-
+    const tx = await factory.createCampaign(params);
     const receipt = await tx.wait();
 
-    const event = receipt.logs
-      .map((log) => {
-        try {
-          return factory.interface.parseLog(log);
-        } catch {
-          return null;
-        }
-      })
-      .find((parsed) => parsed?.name === 'CampaignCreated');
-
-    const campaignAddress = event?.args?.campaign ?? null;
-
-    return { receipt, campaignAddress, deployBlock: receipt.blockNumber };
+    return { receipt, campaignAddress };
   } catch (err) {
     console.error("Errore nella creazione della campagna:", err);
     throw err;
@@ -186,21 +165,23 @@ export async function createCampaign(signer, campaignDetails) {
 // ------------------------------------------------------------------------ //
 
 // Ottiene la lista dei backer di una campagna tramite l'evento Funded 
-export async function getCampaignBackers(provider, campaignAddress) {
+export async function getCampaignBackers(provider, campaignAddress, decimals) {
   const campaign = new ethers.Contract(campaignAddress, CampaignABI, provider);
 
-  // Filtro in base all'evento e ottengo i log,
-  // uso deploy_block per limitare la ricerca ai log successivi al deploy del contratto
+  // Filtro in base all'evento e ottengo i log
   const filter = campaign.filters.Funded();
-  const events = await campaign.queryFilter(filter, "latest");
+  
+  const currentBlock = await provider.getBlockNumber();
+  const fromBlock = Math.max(0, currentBlock - 50);
+  const events = await campaign.queryFilter(filter, fromBlock, "latest");
 
   const backers = await Promise.all(
     events.map(async (event) => {
       const block = await event.getBlock();
       return {
-        address: event.args.contributor,
-        amount: event.args.amount.toString(),
-        timestamp: block.timestamp * 1000 // secondi -> millisecondi
+        address: event.args[0],
+        amount: ethers.formatUnits(event.args.amount, decimals),
+        timestamp: block.timestamp
       };
     })
   );
@@ -211,17 +192,44 @@ export async function getCampaignBackers(provider, campaignAddress) {
 
 // ------------------------------------------------------------------------ //
 
-export async function support(signer, campaignAddress, amount) {
-  console.log("Supporting the campaign with: ", amount);
+export async function support(signer, campaignAddress, token, amount, decimals) {
+  console.log("Supporting with:", amount, "the Campaign:", campaignAddress);
+
+  const campaign = new ethers.Contract(campaignAddress, CampaignABI, signer);
+
+  // todo: aggiungere un controllo per mandare solo la parte rimanente della threshold
+  //       in caso l'utente voglia mandare un valore superiore
+
+  // Converte amount in unità minima
+  const parsedAmount = ethers.parseUnits(amount.toString(), decimals);
+
+  // Controlla l'allowance verso il contratto campaign
+  const fundingTokenContract = new ethers.Contract(token, ERC20ABI, signer);
+  const userAddress = await signer.getAddress();
+  const allowance = await fundingTokenContract.allowance(userAddress, campaignAddress);
+
+  if (allowance < parsedAmount) {
+    const approveTx = await fundingTokenContract.approve(campaignAddress, parsedAmount);
+    await approveTx.wait();
+  }
+
+  const tx = await campaign.support(parsedAmount);
+  await tx.wait();
 }
+
 
 export async function withdraw(signer, campaignAddress) {
 
 }
 
-export async function finalize(signer, campaignAddress) {
 
+
+export async function finalize(signer, campaignAddress) {
+  const campaign = new ethers.Contract(campaignAddress, CampaignABI, signer);
+  const tx = await campaign.finalize();
+  await tx.wait();
 }
+
 
 export async function refund(signer, campaignAddress) {
 
@@ -233,8 +241,12 @@ export async function claimReward(signer, campaignAddress) {
 
 
 export async function proposerWithdraw(signer, campaignAddress) {
-
+  const campaign = new ethers.Contract(campaignAddress, CampaignABI, signer);
+  const tx = await campaign.proposerWithdraw();
+  await tx.wait();
 }
+
+
 
 
 

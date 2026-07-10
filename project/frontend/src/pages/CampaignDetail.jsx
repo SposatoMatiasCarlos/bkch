@@ -1,25 +1,26 @@
 import { useState, useEffect } from 'react'
-import { getDaysLeft, formatNumber, toMs, getCampaignState } from '../logic/Util'
-import { getCampaignBackers, support, withdraw, finalize, claimReward, refund, proposerWithdraw } from '../logic/Campaigns'
+import { formatNumber, toMs, getCampaignState, timeAgo, parseTxError, shortenAddress } from '../logic/Util'
+import { getCampaignBackers, getCampaignDetails, support, withdraw, finalize, claimReward, refund, proposerWithdraw } from '../logic/Campaigns'
 import { useWallet } from '../data/WalletContext'
 import ProgressBar from '../components/ProgressBar'
 import './CampaignDetail.css'
 
-export default function CampaignDetail({ campaign, onBackToExplore }) {
+export default function CampaignDetail({ campaign: initialCampaign, onBackToExplore }) {
 
-  const [backAmount, setBackAmount] = useState('') // usato dal form
+  const [campaign, setCampaign] = useState(initialCampaign)
+  const [backAmount, setBackAmount] = useState('')
   const [backers, setBackers] = useState([])
   const [txPending, setTxPending] = useState(false)
-  const { rpcProvider, signer, connected } = useWallet()
-
+  const { rpcProvider, signer, connected, address } = useWallet()
 
   async function loadBackers() {
     if (!campaign || !rpcProvider) return
     try {
-      const data = await getCampaignBackers(rpcProvider, campaign.address)
+      const data = await getCampaignBackers(rpcProvider, campaign.address, campaign.fundingDecimals)
+      console.log("Backers caricati:", data) 
       setBackers(data)
     } catch (err) {
-      console.error("Errore nel caricamento dei backers:", err)
+      console.log("Errore nel caricamento dei backers:", err)
     }
   }
 
@@ -43,31 +44,26 @@ export default function CampaignDetail({ campaign, onBackToExplore }) {
 
   const {
     isSuccess, isFailed, isInProgress, needsFinalize,
-    canBack, canWithdraw, canClaim, canRefund, statusLabel
-  } = getCampaignState(campaign)
+    isProposer, statusLabel
+  } = getCampaignState(campaign, address)
 
   const rewardPreview = backAmount && campaign.exchangeRate
     ? (Number(backAmount) * campaign.exchangeRate).toLocaleString()
     : null
 
-  const timeAgo = (timestamp) => {
-    const diff = Date.now() - toMs(timestamp)
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-    if (days === 0) return 'today'
-    if (days === 1) return '1 day ago'
-    return `${days} days ago`
-  }
-
   async function runTx(fn) {
-    if (!connected){
-      alert("Devi connettere il wallet") 
-      return; 
+    if (!connected) {
+      alert("Devi connettere il wallet")
+      return
     }
     try {
       setTxPending(true)
       await fn()
+      const updated = await getCampaignDetails(rpcProvider, campaign.address, address)
+      setCampaign(updated)
+      console.log("Updated Campaign: ", updated);
     } catch (err) {
-      console.error(err)
+      alert(parseTxError(err))
     } finally {
       setTxPending(false)
     }
@@ -162,7 +158,7 @@ export default function CampaignDetail({ campaign, onBackToExplore }) {
                 <div className="backer-list">
                   {backers.map((backer, i) => (
                     <div className="backer-row" key={`${backer.address}-${backer.timestamp}-${i}`}>
-                      <span className="backer-address">{backer.address}</span>
+                      <span className="backer-address">{shortenAddress(backer.address)}</span>
                       <div className="backer-info">
                         <div className="backer-amount">
                           {formatNumber(backer.amount)} {campaign.fundingSymbol}
@@ -173,7 +169,7 @@ export default function CampaignDetail({ campaign, onBackToExplore }) {
                   ))}
                 </div>
               ) : (
-                <p className="detail-no-backers">No backers yet.</p>
+                <p className="detail-no-backers">No recent.</p>
               )}
             </div>
           </div>
@@ -214,8 +210,8 @@ export default function CampaignDetail({ campaign, onBackToExplore }) {
                     <button
                       className="btn btn-primary btn-lg"
                       id="back-campaign-btn"
-                      onClick={() => runTx(() => support(signer, campaign.address, backAmount))}
-                      disabled={!canBack || txPending || !backAmount}
+                      onClick={() => runTx(() => support(signer, campaign.address, campaign.fundingToken, backAmount, campaign.fundingDecimals))}
+                      disabled={txPending || !backAmount}
                     >
                       Back Campaign
                     </button>
@@ -223,7 +219,7 @@ export default function CampaignDetail({ campaign, onBackToExplore }) {
                       className="btn btn-danger btn-sm"
                       id="withdraw-btn"
                       onClick={() => runTx(() => withdraw(signer, campaign.address))}
-                      disabled={!canWithdraw || txPending}
+                      disabled={txPending}
                     >
                       Withdraw My Contribution
                     </button>
@@ -246,16 +242,14 @@ export default function CampaignDetail({ campaign, onBackToExplore }) {
                     >
                       Finalize Campaign
                     </button>
-                    {canWithdraw && (
-                      <button
-                        className="btn btn-danger btn-sm"
-                        id="withdraw-btn"
-                        onClick={() => runTx(() => withdraw(signer, campaign.address))}
-                        disabled={txPending}
-                      >
-                        Withdraw My Contribution
-                      </button>
-                    )}
+                    <button
+                      className="btn btn-danger btn-sm"
+                      id="withdraw-btn"
+                      onClick={() => runTx(() => withdraw(signer, campaign.address))}
+                      disabled={txPending}
+                    >
+                      Withdraw My Contribution
+                    </button>
                   </div>
                 </>
               )}
@@ -264,19 +258,28 @@ export default function CampaignDetail({ campaign, onBackToExplore }) {
                 <>
                   <h3 className="detail-action-title">Campaign Funded!</h3>
                   <p className="detail-action-desc">
-                    {canClaim
-                      ? "This campaign reached its goal. Backers can now claim their reward tokens."
-                      : "You've already claimed your reward tokens."}
+                    This campaign reached its goal. Backers can claim their reward tokens.
                   </p>
                   <div className="detail-action-buttons">
                     <button
                       className="btn btn-accent btn-lg"
                       id="claim-rewards-btn"
                       onClick={() => runTx(() => claimReward(signer, campaign.address))}
-                      disabled={!canClaim || txPending}
+                      disabled={txPending}
                     >
-                      {canClaim ? 'Claim Reward Tokens' : 'Already Claimed'}
+                      Claim Reward Tokens
                     </button>
+
+                    {isProposer && (
+                      <button
+                        className="btn btn-outline btn-lg"
+                        id="proposer-withdraw-btn"
+                        onClick={() => runTx(() => proposerWithdraw(signer, campaign.address))}
+                        disabled={txPending}
+                      >
+                        Withdraw Funding Tokens
+                      </button>
+                    )}
                   </div>
                 </>
               )}
@@ -292,13 +295,25 @@ export default function CampaignDetail({ campaign, onBackToExplore }) {
                       className="btn btn-outline btn-lg"
                       id="refund-btn"
                       onClick={() => runTx(() => refund(signer, campaign.address))}
-                      disabled={!canRefund || txPending}
+                      disabled={txPending}
                     >
-                      {canRefund ? 'Request Refund' : 'Nothing to Refund'}
+                      Request Refund
                     </button>
+
+                    {isProposer && (
+                      <button
+                        className="btn btn-outline btn-lg"
+                        id="proposer-withdraw-btn"
+                        onClick={() => runTx(() => proposerWithdraw(signer, campaign.address))}
+                        disabled={txPending}
+                      >
+                        Withdraw Reward Tokens
+                      </button>
+                    )}
                   </div>
                 </>
               )}
+
             </div>
 
             <div className="detail-info-card animate-fade-in">
@@ -328,12 +343,6 @@ export default function CampaignDetail({ campaign, onBackToExplore }) {
                   <span className="detail-info-label">Remaining</span>
                   <span className="detail-info-value">
                     {formatNumber(Math.max(0, campaign.threshold - campaign.raised))} {campaign.fundingToken.symbol}
-                  </span>
-                </div>
-                <div className="detail-info-row">
-                  <span className="detail-info-label">Reward pool</span>
-                  <span className="detail-info-value">
-                    {formatNumber(campaign.threshold * campaign.exchangeRate)} {campaign.rewardToken.symbol}
                   </span>
                 </div>
               </div>

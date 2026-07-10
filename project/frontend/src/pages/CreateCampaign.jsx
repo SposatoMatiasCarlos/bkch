@@ -42,7 +42,7 @@ export default function CreateCampaign({ onNavigate }) {
     };
 
     try {
-      const { campaignAddress } = await createCampaign(signer, campaignDetails);
+      const { receipt, campaignAddress } = await createCampaign(signer, campaignDetails);
 
       if (campaignAddress) {
         const details = await getCampaignDetails(provider, campaignAddress);

@@ -13,7 +13,7 @@ export const CampaignABI = [
   "function contributions(address) view returns (uint256)",
   "function hasClaimed(address) view returns (bool)",
 
-  // State changing functions
+  // State changing functions-
   "function support(uint256 amount) external",
   "function withdraw() external",
   "function finalize() external",
