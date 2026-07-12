@@ -37,6 +37,36 @@ export function WalletProvider({ children }) {
   }
   
 
+
+  useEffect(() => {
+    if (!window.ethereum) return;
+
+    async function handleAccountsChanged(accounts) {
+      if (accounts.length === 0) {
+        // utente ha disconnesso tutti gli account da MetaMask
+        setConnected(false);
+        setAddress('');
+        setSigner(null);
+        setWalletProvider(null);
+      } else {
+        // nuovo account selezionato: aggiorna address E ricrea il signer
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+
+        setWalletProvider(provider);
+        setSigner(signer);
+        setAddress(accounts[0]);
+        setConnected(true);
+      }
+    }
+
+    window.ethereum.on('accountsChanged', handleAccountsChanged);
+    return () => {
+      window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+    };
+  }, []);
+
+  
   return (
     <WalletContext.Provider value={{ rpcProvider, walletProvider, signer, address, connected, setWalletProvider, setSigner, setAddress, setConnected }}>
       {children}
