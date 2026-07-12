@@ -36,11 +36,10 @@ export function WalletProvider({ children }) {
     }
   }
   
-
-
   useEffect(() => {
     if (!window.ethereum) return;
-
+    console.log("Registro listener accountsChanged"); 
+    
     async function handleAccountsChanged(accounts) {
       if (accounts.length === 0) {
         // utente ha disconnesso tutti gli account da MetaMask
@@ -48,6 +47,7 @@ export function WalletProvider({ children }) {
         setAddress('');
         setSigner(null);
         setWalletProvider(null);
+        console.log("Account disconnesso"); 
       } else {
         // nuovo account selezionato: aggiorna address E ricrea il signer
         const provider = new ethers.BrowserProvider(window.ethereum);
@@ -57,11 +57,13 @@ export function WalletProvider({ children }) {
         setSigner(signer);
         setAddress(accounts[0]);
         setConnected(true);
+        console.log("Nuovo account: ", accounts[0]); 
       }
     }
 
     window.ethereum.on('accountsChanged', handleAccountsChanged);
     return () => {
+      console.log("Rimuovo listener accountsChanged");
       window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
     };
   }, []);

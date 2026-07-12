@@ -1,5 +1,5 @@
 import { Interface } from "ethers";
-import { CampaignABI } from "../data/abi/CampaignABI"; 
+import { CampaignABI } from "../data/abi/CampaignABI";
 
 export const CampaignStatus = {
   SUCCESS: 0,
@@ -16,7 +16,12 @@ export function getCampaignState(campaign, userAddress) {
   const isProposer = userAddress && campaign.proposer &&
     userAddress.toLowerCase() === campaign.proposer.toLowerCase()
 
-  const thresholdReached = (campaign.threshold <= campaign.raised); 
+  // Fix, threshold e raised sono stringhe quindi qui faceva una comparazione
+  // lessicografica e mi diceva che la soglia era stata raggiunta quando non lo era
+  //const thresholdReached = (campaign.threshold <= campaign.raised);
+
+  const thresholdReached = Number(campaign.threshold) <= Number(campaign.raised)
+
 
   return {
     isSuccess,
@@ -106,5 +111,5 @@ export function parseTxError(err) {
     }
   }
 
-  return err?.shortMessage || err?.reason || "Si è verificato un errore imprevisto sulla blockchain.";
+  return err?.shortMessage || err?.reason || "Si è verificato un errore imprevisto";
 }

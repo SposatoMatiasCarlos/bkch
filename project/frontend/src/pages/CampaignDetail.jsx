@@ -27,10 +27,6 @@ export default function CampaignDetail({ campaign: initialCampaign, onBackToExpl
 
   useEffect(() => { loadBackers() }, [campaign, rpcProvider])
 
-  async function refreshCampaign() {
-    const updated = await getCampaignDetails(rpcProvider, campaign.address, address)
-    setCampaign(updated)
-  }
 
   if (!campaign) {
     return (
@@ -57,6 +53,17 @@ export default function CampaignDetail({ campaign: initialCampaign, onBackToExpl
     ? (Number(backAmount) * campaign.exchangeRate).toLocaleString()
     : null
 
+
+  async function refreshCampaign(){
+    try{
+      const updated = await getCampaignDetails(rpcProvider, campaign.address, address); 
+      setCampaign(updated);
+    }  
+    catch(err){
+      console.log("Errore durante il refresh: ", err);
+    }
+  }
+
   async function runTx(fn) {
     if (!connected) {
       alert("Devi connettere il wallet")
@@ -65,12 +72,11 @@ export default function CampaignDetail({ campaign: initialCampaign, onBackToExpl
     try {
       setTxPending(true)
       await fn()
-      await refreshCampaign();
-      console.log("Updated Campaign: ", updated);
     } catch (err) {
       alert(parseTxError(err))
     } finally {
       setTxPending(false)
+      await refreshCampaign()
     }
   }
 
