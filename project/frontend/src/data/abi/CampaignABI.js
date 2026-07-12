@@ -9,9 +9,10 @@ export const CampaignABI = [
   "function deadline() view returns (uint256)",
   "function exchangeRate() view returns (uint256)",
   "function totalRaised() view returns (uint256)",
-  "function status() view returns (uint8)", // enum CampaignStatus: 0=IN_PROGRESS,1=SUCCESS,2=FAILED
+  "function status() view returns (uint8)", // enum CampaignStatus
   "function contributions(address) view returns (uint256)",
   "function hasClaimed(address) view returns (bool)",
+
 
   // State changing functions-
   "function support(uint256 amount) external",
@@ -20,6 +21,8 @@ export const CampaignABI = [
   "function claimRewardToken() external",
   "function refund() external",
   "function proposerWithdraw() external",
+  "function forceFailed() external",
+  "function forceSuccess() external",
 
   // Events
   "event Funded(address indexed backer, uint256 amount)",

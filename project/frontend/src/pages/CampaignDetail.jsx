@@ -4,6 +4,7 @@ import { getCampaignBackers, getCampaignDetails, support, withdraw, finalize, cl
 import { useWallet } from '../data/WalletContext'
 import ProgressBar from '../components/ProgressBar'
 import './CampaignDetail.css'
+import DevTools from '../components/DevTools'
 
 export default function CampaignDetail({ campaign: initialCampaign, onBackToExplore }) {
 
@@ -17,7 +18,7 @@ export default function CampaignDetail({ campaign: initialCampaign, onBackToExpl
     if (!campaign || !rpcProvider) return
     try {
       const data = await getCampaignBackers(rpcProvider, campaign.address, campaign.fundingDecimals)
-      console.log("Backers caricati:", data) 
+      console.log("Backers caricati:", data)
       setBackers(data)
     } catch (err) {
       console.log("Errore nel caricamento dei backers:", err)
@@ -25,6 +26,11 @@ export default function CampaignDetail({ campaign: initialCampaign, onBackToExpl
   }
 
   useEffect(() => { loadBackers() }, [campaign, rpcProvider])
+
+  async function refreshCampaign() {
+    const updated = await getCampaignDetails(rpcProvider, campaign.address, address)
+    setCampaign(updated)
+  }
 
   if (!campaign) {
     return (
@@ -59,8 +65,7 @@ export default function CampaignDetail({ campaign: initialCampaign, onBackToExpl
     try {
       setTxPending(true)
       await fn()
-      const updated = await getCampaignDetails(rpcProvider, campaign.address, address)
-      setCampaign(updated)
+      await refreshCampaign();
       console.log("Updated Campaign: ", updated);
     } catch (err) {
       alert(parseTxError(err))
@@ -351,6 +356,11 @@ export default function CampaignDetail({ campaign: initialCampaign, onBackToExpl
           </div>
         </div>
       </div>
+      <DevTools
+        campaignAddress={campaign.address}
+        isProposer={isProposer}
+        onDone={refreshCampaign}
+      />
     </div>
   )
 }

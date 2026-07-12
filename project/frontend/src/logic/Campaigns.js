@@ -3,7 +3,7 @@ import { CampaignFactoryABI } from "../data/abi/CampaignFactoryABI.js";
 import { CampaignABI } from "../data/abi/CampaignABI.js";
 import { ERC20ABI } from "../data/abi/ERC20ABI.js";
 
-const FACTORY_ADDRESS = "0x9A2Bb5fDCA1e5487B59D5F090a4998A41b0EEfaf";
+const FACTORY_ADDRESS = "0x43dc2Fbdb0286207Ed0413d8bD5b0D8c34A06861";
 
 // ------------------------------------------------------------------------ //
 // Combina le funzioni per ottenere tutte le campagne con i loro dettagli,
@@ -139,27 +139,22 @@ export async function createCampaign(signer, campaignDetails) {
 
   const requiredRewards = await factory.getRequiredRewards(params);
 
-  try {
-    const rewardTokenContract = new ethers.Contract(rewardToken, ERC20ABI, signer);
 
-    // Restituisce quanti token un contratto può spendere per conto di un utente
-    const allowance = await rewardTokenContract.allowance(userAddress, FACTORY_ADDRESS);
-    if (allowance < requiredRewards) {
+  const rewardTokenContract = new ethers.Contract(rewardToken, ERC20ABI, signer);
 
-      // Se il numero di token è minore a quello richiesto allora 
-      // l'utente deve autorizzare il contratto a spendere requiredRewards
-      const approveTx = await rewardTokenContract.approve(FACTORY_ADDRESS, requiredRewards);
-      await approveTx.wait();
-    }
+  // Restituisce quanti token un contratto può spendere per conto di un utente
+  const allowance = await rewardTokenContract.allowance(userAddress, FACTORY_ADDRESS);
+  if (allowance < requiredRewards) {
 
-    const tx = await factory.createCampaign(params);
-    const receipt = await tx.wait();
-
-    return { receipt, campaignAddress };
-  } catch (err) {
-    console.error("Errore nella creazione della campagna:", err);
-    throw err;
+    // Se il numero di token è minore a quello richiesto allora 
+    // l'utente deve autorizzare il contratto a spendere requiredRewards
+    const approveTx = await rewardTokenContract.approve(FACTORY_ADDRESS, requiredRewards);
+    await approveTx.wait();
   }
+
+  const tx = await factory.createCampaign(params); // Aspetta l'invio della transazione
+  await tx.wait(); // Attende che sia confermata nella blockchain
+
 }
 
 // ------------------------------------------------------------------------ //
@@ -170,7 +165,7 @@ export async function getCampaignBackers(provider, campaignAddress, decimals) {
 
   // Filtro in base all'evento e ottengo i log
   const filter = campaign.filters.Funded();
-  
+
   const currentBlock = await provider.getBlockNumber();
   const fromBlock = Math.max(0, currentBlock - 50);
   const events = await campaign.queryFilter(filter, fromBlock, "latest");
@@ -219,7 +214,9 @@ export async function support(signer, campaignAddress, token, amount, decimals) 
 
 
 export async function withdraw(signer, campaignAddress) {
-
+  const campaign = new ethers.Contract(campaignAddress, CampaignABI, signer);
+  const tx = await campaign.withdraw();
+  await tx.wait();
 }
 
 
@@ -232,11 +229,15 @@ export async function finalize(signer, campaignAddress) {
 
 
 export async function refund(signer, campaignAddress) {
-
+  const campaign = new ethers.Contract(campaignAddress, CampaignABI, signer);
+  const tx = await campaign.refund(); 
+  await tx.wait();
 }
 
 export async function claimReward(signer, campaignAddress) {
-
+  const campaign = new ethers.Contract(campaignAddress, CampaignABI, signer); 
+  const tx = await campaign.claimRewardToken(); 
+  await tx.wait(); 
 }
 
 
@@ -245,6 +246,25 @@ export async function proposerWithdraw(signer, campaignAddress) {
   const tx = await campaign.proposerWithdraw();
   await tx.wait();
 }
+
+
+// ------------------------------------------------------------------------ //
+
+// Funzioni per il testing
+export async function forceSuccess(signer, campaignAddress) {
+  const campaign = new ethers.Contract(campaignAddress, CampaignABI, signer);
+  const tx = await campaign.forceSuccess();
+  await tx.wait();
+}
+
+export async function forceFailed(signer, campaignAddress) {
+  const campaign = new ethers.Contract(campaignAddress, CampaignABI, signer);
+  const tx = await campaign.forceFailed();
+  await tx.wait();
+}
+
+
+
 
 
 

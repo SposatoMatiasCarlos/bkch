@@ -139,4 +139,12 @@ contract Campaign {
         }
     }
 
+    // Funzioni per il testing 
+    function forceFailed() external onlyProposer{
+        status = CampaignStatus.FAILED; 
+    }
+
+    function forceSuccess() external onlyProposer {
+        status = CampaignStatus.SUCCESS;
+    }
 }

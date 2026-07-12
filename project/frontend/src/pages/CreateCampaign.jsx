@@ -42,14 +42,7 @@ export default function CreateCampaign({ onNavigate }) {
     };
 
     try {
-      const { receipt, campaignAddress } = await createCampaign(signer, campaignDetails);
-
-      if (campaignAddress) {
-        const details = await getCampaignDetails(provider, campaignAddress);
-        console.log("Nuova campagna:", campaignAddress);
-        console.log("Dettagli:", details);
-      }
-
+      await createCampaign(signer, campaignDetails);
       setShowToast(true);
       onNavigate('explore');
     } catch (err) {
