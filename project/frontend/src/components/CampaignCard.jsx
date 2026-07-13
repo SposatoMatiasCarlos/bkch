@@ -3,9 +3,11 @@ import ProgressBar from './ProgressBar'
 import './CampaignCard.css'
 
 export default function CampaignCard({ campaign, onSelectCampaign }) {
-  const { isFailed, needsFinalize, statusLabel } = getCampaignState(campaign)
+  const { isSuccess, isFailed, needsFinalize, statusLabel } = getCampaignState(campaign)
 
-  const statusBadge = isFailed
+  const statusBadge = isSuccess
+    ? { className: 'badge badge-funded', text: 'Funded' }
+    : isFailed
     ? { className: 'badge badge-ended', text: 'Failed' }
     : needsFinalize
     ? { className: 'badge badge-pending', text: 'Awaiting finalization' }
@@ -43,7 +45,12 @@ export default function CampaignCard({ campaign, onSelectCampaign }) {
       <p className="campaign-card-desc">{campaign.description}</p>
 
       <div className="campaign-card-progress">
-        <ProgressBar raised={Number(campaign.raised)} threshold={Number(campaign.threshold)} symbol={campaign.symbol} />
+        <ProgressBar
+          raised={Number(campaign.raised)}
+          threshold={Number(campaign.threshold)}
+          symbol={campaign.symbol}
+          highlightFunded={false}
+        />
       </div>
     </div>
   )

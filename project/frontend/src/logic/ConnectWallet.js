@@ -4,6 +4,7 @@ export async function connectWallet() {
 
     if (!window.ethereum) {
         console.error("MetaMask non è installato.");
+        alert("Metamask non è installato");
         return null;
     }
 

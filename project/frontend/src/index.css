@@ -58,8 +58,8 @@
   --color-accent-deep: #C0C0C0;
   --color-accent-bg: rgba(255, 255, 255, 0.06);
 
-  --color-success: #00f0ff;
-  --color-success-bg: rgba(0, 240, 255, 0.05);
+  --color-success: #22c55e;
+  --color-success-bg: rgba(34, 197, 94, 0.08);
   --color-warning: #ffb700;
   --color-warning-bg: rgba(255, 183, 0, 0.05);
   --color-danger: #ff3b30;
@@ -100,8 +100,8 @@ body {
   --color-accent-deep: #C0C0C0;
   --color-accent-bg: rgba(255, 255, 255, 0.06);
 
-  --color-success: #00f0ff;
-  --color-success-bg: rgba(0, 240, 255, 0.05);
+  --color-success: #22c55e;
+  --color-success-bg: rgba(34, 197, 94, 0.08);
   --color-warning: #ffb700;
   --color-warning-bg: rgba(255, 183, 0, 0.05);
   --color-danger: #ff3b30;
@@ -366,7 +366,7 @@ textarea.form-input {
 .badge-funded {
   background: var(--color-success-bg);
   color: var(--color-success);
-  border: 1px solid rgba(0, 240, 255, 0.25);
+  border: 1px solid rgba(34, 197, 94, 0.25);
 }
 
 .badge-warning {

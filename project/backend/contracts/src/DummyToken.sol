@@ -8,7 +8,7 @@ contract TestToken is ERC20 {
         _mint(msg.sender, 1_000_000 * 10 ** decimals());
     }
 
-    // utile in test: mint libero per generarti fondi quando vuoi
+  
     function mint(address to, uint256 amount) external {
         _mint(to, amount);
     }

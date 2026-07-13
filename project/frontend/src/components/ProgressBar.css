@@ -30,7 +30,7 @@
 
 .progress-fill.funded {
   background: var(--color-success);
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
 }
 
 .progress-label {

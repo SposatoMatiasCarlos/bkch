@@ -1,9 +1,9 @@
 import { getProgress, formatNumber } from '../logic/Util'
 import './ProgressBar.css'
 
-export default function ProgressBar({ raised, threshold, symbol, size = 'default', showLabel = true }) {
+export default function ProgressBar({ raised, threshold, symbol, size = 'default', showLabel = true, funded = false, highlightFunded = true }) {
   const progress = getProgress(raised, threshold)
-  const isFunded = progress >= 100
+  const isFunded = highlightFunded && (funded || progress >= 100)
 
   return (
     <div className="progress-bar-wrapper">
