@@ -3,7 +3,7 @@ import { CampaignFactoryABI } from "../data/abi/CampaignFactoryABI.js";
 import { CampaignABI } from "../data/abi/CampaignABI.js";
 import { ERC20ABI } from "../data/abi/ERC20ABI.js";
 
-const FACTORY_ADDRESS = "0x43dc2Fbdb0286207Ed0413d8bD5b0D8c34A06861";
+const FACTORY_ADDRESS = "0xa0DB6bdAB935F03919628eEe28D118158c68FAD9";
 
 // ------------------------------------------------------------------------ //
 // Combina le funzioni per ottenere tutte le campagne con i loro dettagli,
